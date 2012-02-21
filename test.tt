@@ -1,0 +1,12 @@
+<dl>
+<dt>名前:</dt>
+<dd>[% name %]</dd>
+<dt>特技:</dt>
+<dd>[% skill.0 %], [% skill.1 %]</dd>
+<dt>好きな映画: </dt>
+<dd>[% favorite.movie %]</dd>
+<dt>ひとこと:</dt>
+<dd>[% hello("みなさん") %]</dd>
+<dt>はてな:</dt>
+<dd>[% "http://d.hatena.ne.jp/" _ hatena _ "/about" %]</dd>
+</dl>

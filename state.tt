@@ -1,0 +1,154 @@
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>mixi Graph API Demo</title>
+    <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/build/reset/reset.css">
+    <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/build/fonts/fonts.css">
+    <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/build/grids/grids.css">
+    <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/build/base/base.css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+});
+</script>
+
+<style>
+#current {color: Teal;}
+hr.shadow {
+height: 12px;
+border: 0;
+  box-shadow: inset 0 12px 12px -12px rgba(0,0,0,0.5);
+}
+</style>
+
+  </head>
+
+  <body>
+    <hr class="shadow">
+
+    <div id="doc2" class="yui-t6">
+      <div id="hd">
+        <h1>mixi Graph API Demo</h1>
+        <p>mixi Graph APIを用いたOAuth 2.0(draft 10) Web Server Profile の動作デモ</p>
+        <div id="gallery">
+        </div>
+      </div>
+
+      <div [% IF state == 1 %] id="current" [% END %]>
+        <h2>Step 1. Clientにサービス要求</h2>
+        [% IF state == 1 %]
+        次のステップに進んでください。
+        <form method="post" action="./state.pl">
+          <input type="hidden" name="state" value="2">
+          <input type="submit" value="Step2に進む">
+        </form>
+        [% END %]
+      </div>
+
+      <div [% IF state == 2 %] id="current" [% END %]>
+        <h2>Step 2. AuthZ Serverにリダイレクト</h2>
+        [% IF state == 2 %]
+        Facebook, Google, mixi, ...だいたいのAuthZ ServerはClientから要求されたScopeにひもづくリソースへのアクセスを許可するかどうかをユーザーにゆだねます。
+        リダイレクト先のURL : <br>
+        <pre>
+        https://mixi.jp/connect_authorize.pl?client_id=eb7e247c860dff81754d&scope=r_profile r_voice&state=4
+        </pre>
+        <a href="https://mixi.jp/connect_authorize.pl?client_id=eb7e247c860dff81754d&scope=r_profile r_voice&state=4" border=0><input type="button" value="Step3に進む"></a>
+        [% END %]
+      </div>
+
+      <div [% IF state == 3 %] id="current" [% END %]>
+        <h2>Step 3. 認証/認可処理</h2>
+        [% IF state == 4 %]
+        この処理はmixi上で行われます。<br>
+        ユーザーの選択によって、画面を省略することも可能です。
+        [% END %]
+      </div>
+
+      <div [% IF state == 4 %] id="current" [% END %]>
+        <h2>Step 4. Clientにリダイレクト</h2>
+        [% IF state == 4 %]
+        パラメータでcodeの値を取得する。<br>
+        取得したCodeの値 : [% code %]<br>
+        <form method="post" action="./state.pl">
+          <input type="hidden" name="state" value="5">
+          <input type="hidden" name="code" value="[% code %]">
+          <input type="submit" value="Step5に進む">
+        </form>
+        [% END %]
+      </div>
+
+      <div [% IF state == 5 %] id="current" [% END %]>
+        <h2>Step 5. Access Token取得</h2>
+        [% IF state == 5 %]
+        AccessToken取得用URL<br>
+        <pre>
+        https://secure.mixi-platform.com/2/token
+        (POST)
+        grant_type = authorization_code(固定),
+        client_id = eb7e247c860dff81754d(クレデンシャル情報 Consumer Key),
+        client_secret = *****************(クレデンシャル情報 Consumer Secret),
+        code = [% code %],
+        redirect_uri = http://adsdev.symbio.inmobi-jp.com/katsu/mixi_graph/state.pl
+        </pre>
+        <br>
+        AccessToken取得結果<br>
+        <pre>
+        [% token %]
+        </pre>
+
+        <form method="post" action="./state.pl">
+          <input type="hidden" name="state" value="6">
+          <input type="hidden" name="atoken" value="[% atoken %]">
+          <input type="hidden" name="rtoken" value="[% rtoken %]">
+          <input type="submit" value="Step6に進む">
+        </form>
+        [% END %]
+      </div>
+
+      <div [% IF state == 6 %] id="current" [% END %]>
+        <h2>Step 6. Protect Resourceにアクセス</h2>
+        [% IF state == 6 %]
+        User Profile取得用URL<br>
+        <pre>
+        [% url %]
+        </pre>
+        アクセス時のURLはAccessTokenのみでシンプル。<br>
+        <br>
+
+        User Profile取得結果<br>
+        <pre>
+        [% res %]
+        </pre>
+
+        <br>
+        <form method="post" action="./state.pl">
+          <input type="hidden" name="state" value="6">
+          <input type="hidden" name="atoken" value="[% atoken %]">
+          <input type="hidden" name="rtoken" value="[% rtoken %]">
+          <input type="submit" value="もう一度Step6の処理を行う">
+        </form>
+        [% END %]
+      </div>
+
+      <!--
+      <div [% IF state == 7 %] id="current" [% END %]>
+        <h2>Step 7. Access Token更新</h2>
+        [% IF state == 7 %]
+        次のステップに進んでください。
+        <form method="post" action="./state.pl">
+          <input type="hidden" name="state" value="1">
+          <input type="submit" value="Step8に進む">
+        </form>
+        [% END %]
+      </div>
+      -->
+
+      <br><a href="./state.pl">Step1に戻る</a><br>
+    </div>
+
+    <hr class="shadow">
+  </body>
+
+</html>
